@@ -7,3 +7,7 @@ spring:
     username: guest
     password: guest
     virtual-host: /
+    publisher-confirm-type: correlated
+    listener:
+      simple:
+        acknowledge-mode: manual

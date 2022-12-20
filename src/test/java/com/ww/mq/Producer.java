@@ -2,6 +2,8 @@ package com.ww.mq;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -56,5 +59,30 @@ public class Producer {
         map.put("age", 20);
         rabbitTemplate.convertAndSend("topic-exchange", "ex.123.1238", map);
         System.out.println("通配符的模式消息发送成功~");
+    }
+
+    //5.发送端可靠性测试
+    @Test
+    public void sendConfirmTest() {
+        //使用convertAndSend
+        // 创建消息关联的唯一id
+        CorrelationData correlationData = new CorrelationData();
+        correlationData.setId(UUID.randomUUID().toString());
+        //1.当前队列的名称。2.你要携带的信息内容
+        rabbitTemplate.convertAndSend("amq.direct", "confirm", "发送端可靠性测试！！", correlationData);
+    }
+
+    //6.消费端可靠投递
+    @Test
+    public void testReliableDelivery() {
+        for (int i = 0; i < 5; i++) {
+            rabbitTemplate.convertAndSend("work-queue", "这是qq一条消息！！");
+
+//            // 创建消息关联的唯一id
+//            CorrelationData correlationData = new CorrelationData();
+//            correlationData.setId(UUID.randomUUID().toString());
+//            // 发送消息，带上消息的唯一id
+//            rabbitTemplate.convertAndSend("amq.direct", "confirm", "test~~~", correlationData);
+        }
     }
 }
