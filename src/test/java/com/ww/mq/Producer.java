@@ -2,13 +2,13 @@ package com.ww.mq;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -77,12 +77,13 @@ public class Producer {
     public void testReliableDelivery() {
         for (int i = 0; i < 5; i++) {
             rabbitTemplate.convertAndSend("work-queue", "这是qq一条消息！！");
-
-//            // 创建消息关联的唯一id
-//            CorrelationData correlationData = new CorrelationData();
-//            correlationData.setId(UUID.randomUUID().toString());
-//            // 发送消息，带上消息的唯一id
-//            rabbitTemplate.convertAndSend("amq.direct", "confirm", "test~~~", correlationData);
         }
+    }
+
+    //7.死信队列测试
+    @Test
+    public void DlxTest() {
+        System.out.println(new Date());
+        rabbitTemplate.convertAndSend("javaboy_exchange", "javaboy_routing_key", "hello javaboy!");
     }
 }

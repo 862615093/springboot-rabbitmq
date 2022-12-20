@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 public class RabbitMqConfig {
@@ -20,7 +22,7 @@ public class RabbitMqConfig {
 
     // 添加json格式序列化器
     @Bean
-    public MessageConverter messageConverter(){
+    public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }
 
@@ -172,8 +174,68 @@ public class RabbitMqConfig {
     public DirectExchange directExchange1() {
         return new DirectExchange("amq.direct");
     }
+
     @Bean
     public Binding bindQueueToDirectExchange(@Qualifier("direct-queue") Queue queue, @Qualifier("directExchange") DirectExchange directExchange) {
         return BindingBuilder.bind(queue).to(directExchange).with("confirm");
+    }
+
+    //6.死信队列
+
+    /**
+     * 死信队列
+     */
+    @Bean
+    Queue dlxQueue() {
+        return new Queue("dlx_queue", true, false, false);
+    }
+
+    /**
+     * 死信交换机
+     */
+    @Bean
+    DirectExchange dlxExchange() {
+        return new DirectExchange("dlx_exchange", true, false);
+    }
+
+    /**
+     * 绑定死信队列和死信交换机
+     */
+    @Bean
+    Binding dlxBinding() {
+        return BindingBuilder.bind(dlxQueue()).to(dlxExchange()).with("dlx_routing_key");
+    }
+
+    /**
+     * 普通消息队列 并设置 死信队列和TTL
+     */
+    @Bean
+    Queue javaboyQueue() {
+        Map<String, Object> args = new HashMap<>();
+        //设置消息过期时间
+        args.put("x-message-ttl", 1000 * 10);
+        //设置死信交换机
+        args.put("x-dead-letter-exchange", "dlx_exchange");
+        //设置死信 routing_key
+        args.put("x-dead-letter-routing-key", "dlx_routing_key");
+        return new Queue("javaboy_queue", true, false, false, args);
+    }
+
+    /**
+     * 普通交换机
+     */
+    @Bean
+    DirectExchange javaboyExchange() {
+        return new DirectExchange("javaboy_exchange", true, false);
+    }
+
+    /**
+     * 绑定普通队列和与之对应的交换机
+     */
+    @Bean
+    Binding javaboyBinding() {
+        return BindingBuilder.bind(javaboyQueue())
+                .to(javaboyExchange())
+                .with("javaboy_routing_key");
     }
 }
