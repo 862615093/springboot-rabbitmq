@@ -7,7 +7,16 @@ spring:
     username: guest
     password: guest
     virtual-host: /
-    publisher-confirm-type: correlated
+    publisher-confirm-type: correlated # 开启发送端交换机消息确认
+    publisher-returns: true # 开启发送端消息队列消息确认
     listener:
       simple:
-        acknowledge-mode: manual
+        acknowledge-mode: manual # 消费端 ack机制
+    template:
+#      retry: # 发送端重试机制配置
+#        enabled: true  # 是否开启发送端重试，默认关闭
+#        max-attempts: 3  # 消息发送失败时最大重试次数，默认为3
+#        initial-interval: 1000ms  # 发送失败时重试的时间间隔，默认1s
+#        multiplier: 1  # 发送失败时重试时间间隔乘数因子，默认为1
+#        max-interval: 10000ms  # 发送失败时重试时间间隔最大值，默认10s
+      mandatory: true

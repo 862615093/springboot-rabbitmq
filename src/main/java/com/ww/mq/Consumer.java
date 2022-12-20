@@ -1,8 +1,11 @@
 package com.ww.mq;
 
+import com.rabbitmq.client.Channel;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.Map;
 
 @Component
@@ -55,5 +58,13 @@ public class Consumer {
     @RabbitListener(queues = "topic-queue3")
     public void topicQueue3(Map str) {
         System.out.println("通配符的模式监听到了错误消息" + str);
+    }
+
+    //消费
+    @RabbitListener(queues = "confirm-queue")
+    public void confirmQueue(Object str, Channel channel, Message message) throws IOException {
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+        channel.basicAck(deliveryTag, false);
+        System.out.println("confirm-queue=" + str);
     }
 }

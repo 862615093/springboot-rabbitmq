@@ -27,8 +27,8 @@ public class RabbitMqConfig {
     }
 
     @PostConstruct
-    public void initRabbitTemplate() {
-        // 设置发送端确认回调
+    public void initRabbitTemplate()  {
+        //设置发送端交换机收到消息 确认回调 (正常和异常 都会回调)
         rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
             /**
              * @param correlationData 当前消息的唯一关联数据(唯一id)
@@ -37,9 +37,31 @@ public class RabbitMqConfig {
              */
             @Override
             public void confirm(CorrelationData correlationData, boolean ack, String cause) {
+                System.out.println("ConfirmCallback------------------------------------------>");
                 System.out.println("correlationData=" + correlationData);
                 System.out.println("ack=" + ack);
                 System.out.println("cause=" + cause);
+            }
+        });
+
+        //设置发送端消息队列收到消息 确认回调 (消息队列没收到 才会回调)
+        rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
+            /**
+             * 只要消息没有正确投递给指定的队列，就会触发这个失败回调
+             * @param message  投递失败的消息的详细信息
+             * @param replyCode 回复的状态码
+             * @param replyText 回复的文本内容
+             * @param exchange  这个消息发送给哪个交换机
+             * @param routingKey 发送这个消息使用的路由键
+             */
+            @Override
+            public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
+                System.out.println("ReturnCallback------------------------------------------>");
+                System.out.println("message:" + message);
+                System.out.println("replyCode:" + replyCode);
+                System.out.println("replyText:" + replyText);
+                System.out.println("exchange:" + exchange);
+                System.out.println("routingKey:" + routingKey);
             }
         });
     }
@@ -164,24 +186,23 @@ public class RabbitMqConfig {
 
     //5.发送端可靠性测试
     //声明队列
-    @Bean(name = "direct-queue")
-    public Queue directQueue() {
-        return new Queue("direct-queue");
+    @Bean(name = "confirm-queue")
+    public Queue confirmQueue() {
+        return new Queue("confirm-queue");
     }
 
     //声明交换机，路由模式 DirectExchange   Direct：定向，把消息交给符合指定routing key 的队列
-    @Bean(name = "directExchange")
-    public DirectExchange directExchange1() {
-        return new DirectExchange("amq.direct");
+    @Bean(name = "confirmExchange")
+    public DirectExchange confirmExchange() {
+        return new DirectExchange("confirm-exchange");
     }
 
     @Bean
-    public Binding bindQueueToDirectExchange(@Qualifier("direct-queue") Queue queue, @Qualifier("directExchange") DirectExchange directExchange) {
+    public Binding bindQueueToDirectExchange(@Qualifier("confirm-queue") Queue queue, @Qualifier("confirmExchange") DirectExchange directExchange) {
         return BindingBuilder.bind(queue).to(directExchange).with("confirm");
     }
 
     //6.死信队列
-
     /**
      * 死信队列
      */

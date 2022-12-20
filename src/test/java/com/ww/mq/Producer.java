@@ -69,7 +69,7 @@ public class Producer {
         CorrelationData correlationData = new CorrelationData();
         correlationData.setId(UUID.randomUUID().toString());
         //1.当前队列的名称。2.你要携带的信息内容
-        rabbitTemplate.convertAndSend("amq.direct", "confirm", "发送端可靠性测试！！", correlationData);
+        rabbitTemplate.convertAndSend("confirm-exchange", "confirm", "发送端可靠性测试！！", correlationData);
     }
 
     //6.消费端可靠投递
