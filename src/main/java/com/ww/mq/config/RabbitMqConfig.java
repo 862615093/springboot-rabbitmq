@@ -1,5 +1,6 @@
 package com.ww.mq.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -14,6 +15,7 @@ import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Configuration
 public class RabbitMqConfig {
 
@@ -38,6 +40,15 @@ public class RabbitMqConfig {
             @Override
             public void confirm(CorrelationData correlationData, boolean ack, String cause) {
                 System.out.println("ConfirmCallback------------------------------------------>");
+                // 判断结果
+                if (ack) {
+                    // ACK
+                    log.info("消息成功投递到交换机！消息ID: {}", correlationData.getId());
+                } else {
+                    // NACK
+                    log.error("消息投递到交换机失败！消息ID：{}", correlationData.getId());
+                    // 重发消息
+                }
                 System.out.println("correlationData=" + correlationData);
                 System.out.println("ack=" + ack);
                 System.out.println("cause=" + cause);
@@ -57,6 +68,7 @@ public class RabbitMqConfig {
             @Override
             public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
                 System.out.println("ReturnCallback------------------------------------------>");
+                System.out.println("交换机投递到消息队列失败！");
                 System.out.println("message:" + message);
                 System.out.println("replyCode:" + replyCode);
                 System.out.println("replyText:" + replyText);

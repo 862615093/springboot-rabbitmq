@@ -1,4 +1,4 @@
-package com.ww.mq;
+package com.ww.mq.consumer;
 
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.Message;
@@ -10,7 +10,7 @@ import java.io.IOException;
 @Component
 public class DlxConsumer {
 
-    @RabbitListener(queues = "dlx_queue")
+//    @RabbitListener(queues = "dlx_queue")
     public void handle(Message message, String msg, Channel channel) throws IOException {
         // 消息投递的标签号，在同一个channel内按顺序递增
         long deliveryTag = message.getMessageProperties().getDeliveryTag();

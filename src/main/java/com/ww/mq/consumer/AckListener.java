@@ -1,4 +1,4 @@
-package com.ww.mq;
+package com.ww.mq.consumer;
 
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.Message;
@@ -7,7 +7,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 @Component
-@RabbitListener(queues = {"work-queue"})
+//@RabbitListener(queues = {"work-queue"})
 public class AckListener {
     /**
      * 监听队列 direct-queue 中的消息，有消息会自动取出并回调该方法
