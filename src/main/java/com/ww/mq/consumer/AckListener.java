@@ -6,7 +6,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 //@RabbitListener(queues = {"work-queue"})
 public class AckListener {
     /**
@@ -15,7 +15,7 @@ public class AckListener {
      * @param o  从消息体中解码出的javabean
      * @param channel 当前传输的数据通道
      */
-    @RabbitHandler
+//    @RabbitHandler
     public void listen(Message message, Object o, Channel channel){
         // 消息投递的标签号，在同一个channel内按顺序递增
         long deliveryTag = message.getMessageProperties().getDeliveryTag();

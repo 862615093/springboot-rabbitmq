@@ -1,5 +1,6 @@
 package com.ww.mq;
 
+import com.ww.mq.consumer.MessageSender;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -21,6 +22,19 @@ public class Producer {
     //例如：restTemplate  thymeleafTemplate
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    public MessageSender messageSender;
+
+
+    //测试延迟插件
+    @Test
+    public void t() throws InterruptedException {
+        messageSender.send2("wangwei", 120);
+
+        Thread.sleep(500000);
+    }
+
 
     //1.工作队列模式
     @Test

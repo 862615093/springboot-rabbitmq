@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Configuration
+//@Configuration
 public class RabbitMqConfig {
 
     @Autowired
@@ -28,7 +28,7 @@ public class RabbitMqConfig {
         return new Jackson2JsonMessageConverter();
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void initRabbitTemplate()  {
         //设置发送端交换机收到消息 确认回调 (正常和异常 都会回调)
         rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
